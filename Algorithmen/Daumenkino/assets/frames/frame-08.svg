@@ -1,0 +1,44 @@
+<svg width="320" height="220" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="24" y1="20" x2="294" y2="204" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F1A27"/>
+      <stop offset="0.56" stop-color="#122133"/>
+      <stop offset="1" stop-color="#09131D"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="152" y1="20" x2="292" y2="136" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6BB8FF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6BB8FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="plane" x1="-24" y1="0" x2="24" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#D7E4F3"/>
+    </linearGradient>
+    <filter id="blur" x="0" y="0" width="320" height="220" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="320" height="220" rx="28" fill="url(#bg)"/>
+  <rect x="18" y="18" width="284" height="184" rx="22" fill="#102031" stroke="#253D55" stroke-width="2"/>
+  <circle cx="258" cy="56" r="24" fill="#FFB454" fill-opacity="0.17"/>
+  <circle cx="180" cy="38" r="58" fill="url(#mist)" filter="url(#blur)"/>
+  <path d="M40 70H280" stroke="#37536A" stroke-opacity="0.65" stroke-dasharray="6 8"/>
+  <path d="M40 110H280" stroke="#37536A" stroke-opacity="0.45" stroke-dasharray="6 8"/>
+  <path d="M40 150H280" stroke="#37536A" stroke-opacity="0.45" stroke-dasharray="6 8"/>
+  <circle cx="96" cy="80" r="2.4" fill="#E8F1FF" fill-opacity="0.8"/>
+  <circle cx="156" cy="50" r="1.8" fill="#FFB454" fill-opacity="0.82"/>
+  <circle cx="198" cy="80" r="2" fill="#E8F1FF" fill-opacity="0.72"/>
+  <circle cx="244" cy="62" r="1.8" fill="#6BB8FF" fill-opacity="0.9"/>
+  <circle cx="272" cy="90" r="2.2" fill="#E8F1FF" fill-opacity="0.74"/>
+  <circle cx="290" cy="118" r="1.9" fill="#FFB454" fill-opacity="0.78"/>
+  <path d="M24 156C138 156 194 142 226 100" stroke="#6BB8FF" stroke-width="5" stroke-linecap="round" stroke-opacity="0.28"/>
+  <path d="M28 166C146 166 200 150 228 116" stroke="#6BB8FF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.48"/>
+  <ellipse cx="236" cy="102" rx="25" ry="7" fill="#000000" fill-opacity="0.22"/>
+  <g transform="translate(232 84) rotate(11)">
+    <path d="M-24 0L24 -12L0 0L24 12L-24 0Z" fill="url(#plane)" stroke="#E8F1FF" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M0 0L24 -12" stroke="#91A6BC" stroke-width="2"/>
+    <path d="M0 0L24 12" stroke="#91A6BC" stroke-width="2"/>
+    <path d="M-8 -3L8 0L-8 3" stroke="#8EB8DE" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <path d="M264 74L266 79L271 81L266 83L264 88L262 83L257 81L262 79L264 74Z" fill="#FFB454" fill-opacity="0.94"/>
+  <text x="24" y="193" fill="#91A6BC" font-family="Avenir Next, Trebuchet MS, sans-serif" font-size="13" font-weight="700">Frame 08</text>
+</svg>

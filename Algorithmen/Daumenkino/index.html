@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daumenkino Simulation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Algorithmen · Daumenkino</p>
+        <h1>Raumschiff im Vertikalflug</h1>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <article class="stage-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Vorschau</p>
+            <h2>Digitales Daumenkino</h2>
+          </div>
+          <div class="status-pill" id="statusPill">Pausiert</div>
+        </div>
+
+        <div class="flipbook">
+          <div class="page-stack" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="frame-shell">
+            <img id="frameImage" src="assets/frames/frame-01.svg" alt="Frame 1 des Daumenkinos">
+          </div>
+        </div>
+
+        <div class="scrubber-card">
+          <label class="control-label" for="frameSlider">Frame wählen</label>
+          <input class="range-slider" id="frameSlider" type="range" min="1" max="60" value="1">
+          <div class="scrubber-meta">
+            <span id="frameLabel">Frame 1 / 60</span>
+            <span id="progressLabel">0%</span>
+          </div>
+        </div>
+      </article>
+
+      <aside class="control-card">
+        <div class="section-heading compact">
+          <div>
+            <p class="section-label">Steuerung</p>
+            <h2>Playback</h2>
+          </div>
+        </div>
+
+        <p class="panel-copy">Du kannst die Animation automatisch abspielen, einzelne Frames durchblättern oder direkt in den Filmstreifen springen.</p>
+
+        <div class="control-grid">
+          <button class="action-button accent" id="playButton" type="button">Abspielen</button>
+          <button class="action-button secondary" id="prevButton" type="button">Zurück</button>
+          <button class="action-button secondary" id="nextButton" type="button">Weiter</button>
+        </div>
+
+        <label class="control-label" for="speedSlider">Tempo</label>
+        <div class="speed-row">
+          <input class="range-slider" id="speedSlider" type="range" min="3" max="16" value="8">
+          <strong id="speedValue">8 fps</strong>
+        </div>
+
+        <label class="toggle-row" for="loopToggle">
+          <input id="loopToggle" type="checkbox" checked>
+          <span>Endlos wiederholen</span>
+        </label>
+
+        <button class="ghost-button" id="randomButton" type="button">Zufälliger Start</button>
+
+        <div class="note-card">
+          <p class="section-label">Aktuelle Szene</p>
+          <h3 id="sceneTitle">Frame 1</h3>
+          <p id="sceneDescription">Das Raumschiff erscheint nur ganz langsam wieder am unteren Bildschirmrand.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="strip-card">
+      <div class="section-heading compact">
+        <div>
+          <p class="section-label">Filmstreifen</p>
+          <h2>Alle Bilder</h2>
+        </div>
+        <p class="strip-copy">Nutze die Pfeile oder klicke auf ein Bild, um durch die Galerie zu wechseln.</p>
+      </div>
+
+      <div class="gallery-strip">
+        <button class="gallery-arrow" id="galleryPrevButton" type="button" aria-label="Vorheriges Bild">&#10094;</button>
+        <div class="thumbnail-viewport">
+          <div class="thumbnail-strip" id="thumbnailStrip" aria-label="Daumenkino Frames"></div>
+        </div>
+        <button class="gallery-arrow" id="galleryNextButton" type="button" aria-label="Nächstes Bild">&#10095;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
