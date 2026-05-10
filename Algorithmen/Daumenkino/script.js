@@ -1,8 +1,9 @@
-const FRAME_COUNT = 60;
 const FRAME_WIDTH = 320;
 const FRAME_HEIGHT = 220;
-const HIDDEN_FRAMES = 6;
-const VISIBLE_FRAMES = FRAME_COUNT - HIDDEN_FRAMES;
+const SPACESHIP_FRAME_COUNT = 60;
+const SPACESHIP_HIDDEN_FRAMES = 6;
+const SPACESHIP_VISIBLE_FRAMES = SPACESHIP_FRAME_COUNT - SPACESHIP_HIDDEN_FRAMES;
+const BALL_FRAME_COUNT = 48;
 const frameObjectUrls = [];
 
 const starField = [
@@ -23,21 +24,23 @@ function interpolate(start, end, progress) {
   return start + (end - start) * progress;
 }
 
-function easeInSine(progress) {
-  return 1 - Math.cos((progress * Math.PI) / 2);
-}
-
 function formatFrameNumber(value) {
   return String(value).padStart(2, "0");
 }
 
-function getProgress(index) {
-  return FRAME_COUNT === 1 ? 0 : index / (FRAME_COUNT - 1);
+function getProgress(index, frameCount) {
+  return frameCount === 1 ? 0 : index / (frameCount - 1);
 }
 
-function getFlightPoint(progress) {
-  const framePosition = progress * (FRAME_COUNT - 1);
-  const lastVisibleFrame = VISIBLE_FRAMES - 1;
+function createFrameSource(svg) {
+  const objectUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  frameObjectUrls.push(objectUrl);
+  return objectUrl;
+}
+
+function getSpaceshipPoint(progress) {
+  const framePosition = progress * (SPACESHIP_FRAME_COUNT - 1);
+  const lastVisibleFrame = SPACESHIP_VISIBLE_FRAMES - 1;
 
   if (framePosition <= lastVisibleFrame) {
     const localProgress = lastVisibleFrame <= 0 ? 1 : framePosition / lastVisibleFrame;
@@ -54,18 +57,18 @@ function getFlightPoint(progress) {
   };
 }
 
-function getFlightAngle(progress) {
+function getSpaceshipAngle(progress) {
   const delta = 0.01;
-  const before = getFlightPoint(Math.max(progress - delta, 0));
-  const after = getFlightPoint(Math.min(progress + delta, 1));
+  const before = getSpaceshipPoint(Math.max(progress - delta, 0));
+  const after = getSpaceshipPoint(Math.min(progress + delta, 1));
   return Math.atan2(after.y - before.y, after.x - before.x) * (180 / Math.PI);
 }
 
-function getSceneDescription(progress) {
-  const framePosition = progress * (FRAME_COUNT - 1);
-  const visibleProgress = (VISIBLE_FRAMES - 1) <= 0 ? 1 : Math.min(framePosition / (VISIBLE_FRAMES - 1), 1);
+function getSpaceshipDescription(progress) {
+  const framePosition = progress * (SPACESHIP_FRAME_COUNT - 1);
+  const visibleProgress = (SPACESHIP_VISIBLE_FRAMES - 1) <= 0 ? 1 : Math.min(framePosition / (SPACESHIP_VISIBLE_FRAMES - 1), 1);
 
-  if (framePosition >= VISIBLE_FRAMES) {
+  if (framePosition >= SPACESHIP_VISIBLE_FRAMES) {
     return "Jetzt ist das Raumschiff komplett außerhalb des Bildes, bevor der nächste Zyklus unten wieder beginnt.";
   }
 
@@ -90,10 +93,10 @@ function renderStars() {
     .join("");
 }
 
-function createFrameSvg(index) {
-  const progress = getProgress(index);
-  const point = getFlightPoint(progress);
-  const angle = getFlightAngle(progress) + 180;
+function createSpaceshipFrameSvg(index) {
+  const progress = getProgress(index, SPACESHIP_FRAME_COUNT);
+  const point = getSpaceshipPoint(progress);
+  const angle = getSpaceshipAngle(progress) + 180;
   const frameNumber = formatFrameNumber(index + 1);
   const sunY = 56;
 
@@ -137,23 +140,90 @@ function createFrameSvg(index) {
   `;
 }
 
-function createFrameSource(index) {
-  const svg = createFrameSvg(index);
-  const objectUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
-  frameObjectUrls.push(objectUrl);
-  return objectUrl;
+function buildSpaceshipFrames() {
+  return Array.from({ length: SPACESHIP_FRAME_COUNT }, (_, index) => {
+    const progress = getProgress(index, SPACESHIP_FRAME_COUNT);
+
+    return {
+      id: index + 1,
+      title: `Frame ${index + 1}`,
+      description: getSpaceshipDescription(progress),
+      src: createFrameSource(createSpaceshipFrameSvg(index))
+    };
+  });
 }
 
-const frames = Array.from({ length: FRAME_COUNT }, (_, index) => {
-  const progress = getProgress(index);
+function getBallPhase(index) {
+  return index / BALL_FRAME_COUNT;
+}
 
-  return {
-    id: index + 1,
-    title: `Frame ${index + 1}`,
-    description: getSceneDescription(progress),
-    src: createFrameSource(index)
-  };
-});
+function getBallBounce(phase) {
+  return Math.max(0, Math.sin(phase * Math.PI));
+}
+
+function getBallDescription(phase) {
+  if (phase < 0.14 || phase > 0.88) {
+    return "Der Ball berührt fast die weiße Fläche und startet direkt in den nächsten Sprung.";
+  }
+
+  if (phase < 0.5) {
+    return "Der Ball springt von der weißen Fläche nach oben.";
+  }
+
+  return "Der Ball fällt wieder sauber auf die weiße Fläche zurück.";
+}
+
+function createBallFrameSvg(index) {
+  const phase = getBallPhase(index);
+  const bounce = getBallBounce(phase);
+  const squash = 1 - bounce;
+  const radius = 22;
+  const floorY = 172;
+  const centerX = 160;
+  const centerY = floorY - radius - Math.pow(bounce, 1.7) * 94;
+  const scaleX = 1 + squash * 0.12;
+  const scaleY = 1 - squash * 0.12;
+  const frameNumber = formatFrameNumber(index + 1);
+
+  return `
+    <svg width="${FRAME_WIDTH}" height="${FRAME_HEIGHT}" viewBox="0 0 ${FRAME_WIDTH} ${FRAME_HEIGHT}" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${FRAME_WIDTH}" height="${FRAME_HEIGHT}" rx="28" fill="#F3F6FA"/>
+      <rect x="18" y="18" width="284" height="184" rx="22" fill="#FFFFFF" stroke="#D7E1EA" stroke-width="2"/>
+      <path d="M38 172H282" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
+      <g transform="translate(${centerX} ${centerY.toFixed(1)}) scale(${scaleX.toFixed(3)} ${scaleY.toFixed(3)})">
+        <circle r="${radius}" fill="none" stroke="#111827" stroke-width="5"/>
+      </g>
+      <text x="24" y="193" fill="#6B7B8C" font-family="Avenir Next, Trebuchet MS, sans-serif" font-size="13" font-weight="700">Frame ${frameNumber}</text>
+    </svg>
+  `;
+}
+
+function buildBallFrames() {
+  return Array.from({ length: BALL_FRAME_COUNT }, (_, index) => {
+    const phase = getBallPhase(index);
+
+    return {
+      id: index + 1,
+      title: `Frame ${index + 1}`,
+      description: getBallDescription(phase),
+      src: createFrameSource(createBallFrameSvg(index))
+    };
+  });
+}
+
+const EXAMPLES = {
+  spaceship: {
+    title: "Raumschiff",
+    frames: buildSpaceshipFrames()
+  },
+  ball: {
+    title: "Ball",
+    frames: buildBallFrames()
+  }
+};
+
+let activeExampleKey = "ball";
+let frames = EXAMPLES[activeExampleKey].frames;
 
 const state = {
   index: 0,
@@ -180,16 +250,11 @@ const statusPill = document.getElementById("statusPill");
 const thumbnailStrip = document.getElementById("thumbnailStrip");
 const galleryPrevButton = document.getElementById("galleryPrevButton");
 const galleryNextButton = document.getElementById("galleryNextButton");
-const frameCountStat = document.getElementById("frameCountStat");
+const playerTitle = document.getElementById("playerTitle");
+const exampleButtons = Array.from(document.querySelectorAll(".example-card"));
 
-frameSlider.max = String(frames.length);
-
-if (frameCountStat) {
-  frameCountStat.textContent = String(frames.length);
-}
-
-function preloadFrames() {
-  frames.forEach((frame) => {
+function preloadFrames(frameList) {
+  frameList.forEach((frame) => {
     const image = new Image();
     image.src = frame.src;
   });
@@ -205,6 +270,31 @@ function clearPlaybackTimer() {
 function centerActiveThumbnail(behavior = "smooth") {
   const activeThumbnail = thumbnailStrip.querySelector(`.thumbnail-button[data-index="${state.index}"]`);
   activeThumbnail?.scrollIntoView({ behavior, inline: "center", block: "nearest" });
+}
+
+function getActiveExample() {
+  return EXAMPLES[activeExampleKey];
+}
+
+function setActiveExample(exampleKey) {
+  if (!EXAMPLES[exampleKey]) {
+    return;
+  }
+
+  setPlayback(false);
+  activeExampleKey = exampleKey;
+  frames = getActiveExample().frames;
+  state.index = 0;
+  playerTitle.textContent = getActiveExample().title;
+  frameSlider.max = String(frames.length);
+
+  exampleButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.example === exampleKey);
+  });
+
+  buildThumbnails();
+  render();
+  centerActiveThumbnail("auto");
 }
 
 function syncPlaybackTimer() {
@@ -289,9 +379,10 @@ function buildThumbnails() {
 function render() {
   const frame = frames[state.index];
   const progress = frames.length > 1 ? Math.round((state.index / (frames.length - 1)) * 100) : 0;
+  const activeExample = getActiveExample();
 
   frameImage.src = frame.src;
-  frameImage.alt = `${frame.title}: ${frame.description}`;
+  frameImage.alt = `${activeExample.title} ${frame.title}: ${frame.description}`;
   frameSlider.value = String(state.index + 1);
   frameLabel.textContent = `${frame.title} / ${frames.length}`;
   progressLabel.textContent = `${progress}%`;
@@ -349,6 +440,12 @@ randomButton.addEventListener("click", () => {
   centerActiveThumbnail("smooth");
 });
 
+exampleButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setActiveExample(button.dataset.example);
+  });
+});
+
 galleryPrevButton?.addEventListener("click", () => {
   goToFrame(state.index - 1, true);
   centerActiveThumbnail("smooth");
@@ -372,6 +469,6 @@ window.addEventListener("beforeunload", () => {
   });
 });
 
-preloadFrames();
-buildThumbnails();
-render();
+preloadFrames(EXAMPLES.ball.frames);
+preloadFrames(EXAMPLES.spaceship.frames);
+setActiveExample(activeExampleKey);

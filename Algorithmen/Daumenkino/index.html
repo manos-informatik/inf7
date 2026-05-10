@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daumenkino Simulation</title>
+  <title>Daumenkino Beispiele</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,16 +11,46 @@
     <header class="hero">
       <div class="hero-copy">
         <p class="eyebrow">Algorithmen · Daumenkino</p>
-        <h1>Raumschiff im Vertikalflug</h1>
+        <h1>Daumenkino Beispiele</h1>
       </div>
     </header>
+
+    <section class="overview-card">
+      <div class="section-heading compact">
+        <div>
+          <p class="section-label">Overview</p>
+          <h2>Beispiel auswählen</h2>
+        </div>
+      </div>
+
+      <div class="example-grid" id="exampleGrid" aria-label="Daumenkino Beispiele">
+        <button class="example-card active" type="button" data-example="ball">
+          <div class="example-preview example-preview-ball" aria-hidden="true">
+            <span class="preview-ground"></span>
+            <span class="preview-ball"></span>
+          </div>
+          <strong>Ball</strong>
+          <span>Ein einfacher Ball auf weißer Fläche, der im Endlosloop sauber hoch und runter springt.</span>
+        </button>
+
+        <button class="example-card" type="button" data-example="spaceship">
+          <div class="example-preview example-preview-spaceship" aria-hidden="true">
+            <span class="preview-sun"></span>
+            <span class="preview-flight-path"></span>
+            <span class="preview-spaceship"></span>
+          </div>
+          <strong>Raumschiff</strong>
+          <span>Vertikaler Flug vor dunklem Himmel mit Off-Screen-Phase und nahtlosem Wiedereintritt.</span>
+        </button>
+      </div>
+    </section>
 
     <section class="workspace">
       <article class="stage-card">
         <div class="section-heading">
           <div>
             <p class="section-label">Vorschau</p>
-            <h2>Digitales Daumenkino</h2>
+            <h2 id="playerTitle">Ball</h2>
           </div>
           <div class="status-pill" id="statusPill">Pausiert</div>
         </div>
@@ -55,7 +85,7 @@
           </div>
         </div>
 
-        <p class="panel-copy">Du kannst die Animation automatisch abspielen, einzelne Frames durchblättern oder direkt in den Filmstreifen springen.</p>
+        <p class="panel-copy">Wähle oben ein Beispiel aus und blättere danach durch die Frames oder starte die Animation im Loop.</p>
 
         <div class="control-grid">
           <button class="action-button accent" id="playButton" type="button">Abspielen</button>
@@ -79,7 +109,7 @@
         <div class="note-card">
           <p class="section-label">Aktuelle Szene</p>
           <h3 id="sceneTitle">Frame 1</h3>
-          <p id="sceneDescription">Das Raumschiff erscheint nur ganz langsam wieder am unteren Bildschirmrand.</p>
+          <p id="sceneDescription">Der Ball berührt fast die weiße Fläche und startet direkt in den nächsten Sprung.</p>
         </div>
       </aside>
     </section>
@@ -90,7 +120,7 @@
           <p class="section-label">Filmstreifen</p>
           <h2>Alle Bilder</h2>
         </div>
-        <p class="strip-copy">Nutze die Pfeile oder klicke auf ein Bild, um durch die Galerie zu wechseln.</p>
+        <p class="strip-copy">Nutze die Pfeile oder klicke auf ein Bild, um durch die Frames des gewählten Beispiels zu wechseln.</p>
       </div>
 
       <div class="gallery-strip">
