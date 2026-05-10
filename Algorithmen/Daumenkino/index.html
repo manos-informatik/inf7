@@ -13,17 +13,10 @@
         <p class="eyebrow">Algorithmen · Daumenkino</p>
         <h1>Daumenkino Beispiele</h1>
       </div>
-    </header>
 
-    <section class="overview-card">
-      <div class="section-heading compact">
-        <div>
-          <p class="section-label">Overview</p>
-          <h2>Beispiel auswählen</h2>
-        </div>
-      </div>
-
-      <div class="example-grid" id="exampleGrid" aria-label="Daumenkino Beispiele">
+      <div class="hero-selector">
+        <p class="section-label">Beispiele</p>
+        <div class="example-grid example-grid-compact" id="exampleGrid" aria-label="Daumenkino Beispiele">
         <button class="example-card active" type="button" data-example="ball">
           <div class="example-preview example-preview-ball" aria-hidden="true">
             <span class="preview-ground"></span>
@@ -42,8 +35,19 @@
           <strong>Raumschiff</strong>
           <span>Vertikaler Flug vor dunklem Himmel mit Off-Screen-Phase und nahtlosem Wiedereintritt.</span>
         </button>
+
+        <button class="example-card" type="button" data-example="custom">
+          <div class="example-preview example-preview-custom" aria-hidden="true">
+            <span class="preview-custom-sheet"></span>
+            <span class="preview-custom-onion"></span>
+            <span class="preview-custom-stroke"></span>
+          </div>
+          <strong>Eigenes Daumenkino</strong>
+          <span>Zeichne deine eigenen Frames mit drei Farben, Radierer und transparenter Vorlage des letzten gespeicherten Bildes.</span>
+        </button>
+        </div>
       </div>
-    </section>
+    </header>
 
     <section class="workspace">
       <article class="stage-card">
@@ -85,7 +89,7 @@
           </div>
         </div>
 
-        <p class="panel-copy">Wähle oben ein Beispiel aus und blättere danach durch die Frames oder starte die Animation im Loop.</p>
+        <p class="panel-copy">Wähle ein Beispiel aus und blättere danach durch die Frames oder starte die Animation im Loop.</p>
 
         <div class="control-grid">
           <button class="action-button accent" id="playButton" type="button">Abspielen</button>
@@ -104,12 +108,51 @@
           <span>Endlos wiederholen</span>
         </label>
 
-        <button class="ghost-button" id="randomButton" type="button">Zufälliger Start</button>
+        <div class="custom-editor-card" id="customEditorCard" hidden>
+          <div class="section-heading compact">
+            <div>
+              <p class="section-label">Editor</p>
+              <h2>Eigenes Daumenkino</h2>
+            </div>
+            <div class="custom-meta" id="customFrameCount">0 Frames</div>
+          </div>
 
-        <div class="note-card">
-          <p class="section-label">Aktuelle Szene</p>
-          <h3 id="sceneTitle">Frame 1</h3>
-          <p id="sceneDescription">Der Ball berührt fast die weiße Fläche und startet direkt in den nächsten Sprung.</p>
+          <p class="panel-copy">Zeichne einen Frame, speichere ihn ab und starte direkt den nächsten. Der letzte gespeicherte Frame erscheint mit 25% Transparenz im Hintergrund.</p>
+
+          <div class="editor-surface">
+            <div class="editor-stack">
+              <canvas id="onionCanvas" width="320" height="220" aria-hidden="true"></canvas>
+              <canvas id="drawCanvas" width="320" height="220" aria-label="Zeichenfläche für eigenes Daumenkino"></canvas>
+            </div>
+          </div>
+
+          <div class="tool-palette" id="customToolPalette" aria-label="Werkzeuge">
+            <button class="tool-button active" type="button" data-tool="ink">
+              <span class="tool-swatch swatch-dark"></span>
+              Schwarz
+            </button>
+            <button class="tool-button" type="button" data-tool="blue">
+              <span class="tool-swatch swatch-blue"></span>
+              Blau
+            </button>
+            <button class="tool-button" type="button" data-tool="orange">
+              <span class="tool-swatch swatch-orange"></span>
+              Orange
+            </button>
+            <button class="tool-button" type="button" data-tool="erase">
+              <span class="tool-swatch swatch-erase"></span>
+              Radierer
+            </button>
+          </div>
+
+          <div class="custom-action-row">
+            <button class="action-button accent" id="saveCustomFrameButton" type="button">Frame speichern</button>
+            <button class="action-button secondary" id="downloadCustomGifButton" type="button">Als GIF herunterladen</button>
+            <button class="action-button secondary" id="clearCustomFrameButton" type="button">Zeichnung löschen</button>
+            <button class="action-button secondary" id="resetCustomFramesButton" type="button">Alles verwerfen</button>
+          </div>
+
+          <p class="mini-note" id="customEditorHint">Noch kein Frame gespeichert. Zeichne deinen ersten Frame und speichere ihn ab.</p>
         </div>
       </aside>
     </section>
