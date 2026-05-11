@@ -182,6 +182,11 @@
       overflow: auto;
     }
 
+    .canvas-frame.celebration-frame {
+      position: relative;
+      overflow: hidden;
+    }
+
     canvas {
       display: block;
       width: min(100%, var(--board-size));
@@ -189,6 +194,123 @@
       border-radius: 18px;
       background: var(--canvas-bg);
       box-shadow: inset 0 0 0 1px rgba(136, 170, 201, 0.12);
+    }
+
+    .celebration-overlay {
+      position: absolute;
+      inset: 10px;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: 18px;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .celebration-overlay.active {
+      visibility: visible;
+      animation: celebration-fade 1800ms ease forwards;
+    }
+
+    .celebration-smiley {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 34% 38%, #172231 0 5px, transparent 6px),
+        radial-gradient(circle at 66% 38%, #172231 0 5px, transparent 6px),
+        radial-gradient(circle at 50% 24%, rgba(255, 255, 255, 0.5), transparent 26%),
+        linear-gradient(145deg, #ffe37a, #ffb454 58%, #ff8a3d);
+      box-shadow: 0 12px 30px rgba(255, 180, 84, 0.34);
+      transform-origin: center bottom;
+      opacity: 0;
+    }
+
+    .celebration-overlay.active .celebration-smiley {
+      animation: smiley-cheer 860ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .celebration-smiley::before,
+    .celebration-smiley::after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      width: 48px;
+      height: 48px;
+      border-top: 8px solid #ffe37a;
+      border-radius: 50%;
+    }
+
+    .celebration-smiley::before {
+      left: -34px;
+      transform: rotate(-42deg);
+    }
+
+    .celebration-smiley::after {
+      right: -34px;
+      transform: rotate(42deg);
+    }
+
+    .celebration-mouth {
+      position: absolute;
+      left: 29px;
+      bottom: 28px;
+      width: 38px;
+      height: 20px;
+      border-bottom: 6px solid #172231;
+      border-radius: 0 0 32px 32px;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -18px;
+      width: 9px;
+      height: 16px;
+      border-radius: 2px;
+      opacity: 0;
+    }
+
+    .celebration-overlay.active .confetti {
+      animation: confetti-drop 1260ms ease-out forwards;
+    }
+
+    .confetti:nth-child(1) {
+      left: 13%;
+      background: #6bb8ff;
+      animation-delay: 40ms;
+    }
+
+    .confetti:nth-child(2) {
+      left: 25%;
+      background: #59d48f;
+      animation-delay: 140ms;
+    }
+
+    .confetti:nth-child(3) {
+      left: 39%;
+      background: #ffb454;
+      animation-delay: 80ms;
+    }
+
+    .confetti:nth-child(4) {
+      left: 58%;
+      background: #ff7a38;
+      animation-delay: 190ms;
+    }
+
+    .confetti:nth-child(5) {
+      left: 73%;
+      background: #e8f1ff;
+      animation-delay: 110ms;
+    }
+
+    .confetti:nth-child(6) {
+      left: 86%;
+      background: #6bb8ff;
+      animation-delay: 250ms;
     }
 
     .control-card {
@@ -424,6 +546,51 @@
       }
     }
 
+    @keyframes celebration-fade {
+      0% {
+        opacity: 0;
+      }
+      10%,
+      78% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes smiley-cheer {
+      0% {
+        opacity: 0;
+        transform: translateY(28px) scale(0.72) rotate(-8deg);
+      }
+      42% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.08) rotate(5deg);
+      }
+      68% {
+        transform: translateY(0) scale(0.98) rotate(-3deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0);
+      }
+    }
+
+    @keyframes confetti-drop {
+      0% {
+        opacity: 0;
+        transform: translateY(-16px) rotate(0deg);
+      }
+      16% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(210px) rotate(240deg);
+      }
+    }
+
     @media (max-width: 1080px) {
       .workspace {
         grid-template-columns: 1fr;
@@ -488,8 +655,19 @@
 
         <article class="board-card">
           <h3>Dein Koordinatensystem</h3>
-          <div class="canvas-frame">
+          <div class="canvas-frame celebration-frame">
             <canvas id="studentCanvas" aria-label="Eigenes Koordinatensystem">Dein Browser unterstützt kein Canvas.</canvas>
+            <div class="celebration-overlay" id="celebrationOverlay" aria-hidden="true">
+              <span class="confetti"></span>
+              <span class="confetti"></span>
+              <span class="confetti"></span>
+              <span class="confetti"></span>
+              <span class="confetti"></span>
+              <span class="confetti"></span>
+              <div class="celebration-smiley">
+                <span class="celebration-mouth"></span>
+              </div>
+            </div>
           </div>
         </article>
       </div>
@@ -623,6 +801,7 @@
     const commandRows = document.getElementById("commandRows");
     const feedback = document.getElementById("feedback");
     const checkButton = document.getElementById("checkButton");
+    const celebrationOverlay = document.getElementById("celebrationOverlay");
     const templateButtons = Array.from(document.querySelectorAll(".template-button"));
     const levelButtons = Array.from(document.querySelectorAll(".level-button"));
 
@@ -637,6 +816,7 @@
     let currentTarget = null;
     let currentStudent = null;
     let nextRowId = 1;
+    let celebrationTimerId = null;
 
     function createRowState(templateKey, values = {}) {
       const template = FUNCTION_TEMPLATES[templateKey];
@@ -1139,7 +1319,28 @@
       feedback.innerHTML = content;
     }
 
+    function hideCelebration() {
+      if (celebrationTimerId !== null) {
+        window.clearTimeout(celebrationTimerId);
+        celebrationTimerId = null;
+      }
+
+      celebrationOverlay.classList.remove("active");
+    }
+
+    function showCelebration() {
+      hideCelebration();
+      void celebrationOverlay.offsetWidth;
+      celebrationOverlay.classList.add("active");
+
+      celebrationTimerId = window.setTimeout(() => {
+        celebrationOverlay.classList.remove("active");
+        celebrationTimerId = null;
+      }, 1800);
+    }
+
     function applyLevel(levelKey) {
+      hideCelebration();
       currentLevelKey = levelKey;
       const level = LEVELS[levelKey];
 
@@ -1169,6 +1370,7 @@
     }
 
     function executeCommands(showMessage = true) {
+      hideCelebration();
       const level = LEVELS[currentLevelKey];
       const prepared = buildCommandsFromRows();
 
@@ -1217,6 +1419,7 @@
     }
 
     function resetStudent() {
+      hideCelebration();
       const level = LEVELS[currentLevelKey];
       drafts[currentLevelKey] = [];
       currentStudent = createEmptyDrawing(level.size);
@@ -1227,6 +1430,7 @@
 
     function checkSolution() {
       if (LEVELS[currentLevelKey].freeDraw) {
+        hideCelebration();
         setFeedback("info", "<p>Im Custom-Modus gibt es keine Lösung zu prüfen.</p>");
         return;
       }
@@ -1244,7 +1448,9 @@
 
       if (drawingsEqual(currentStudent, currentTarget)) {
         setFeedback("success", "<p><strong>Richtig gelöst!</strong> Deine Zeichnung stimmt mit dem Zielmuster überein.</p>");
+        showCelebration();
       } else {
+        hideCelebration();
         setFeedback("error", "<p><strong>Noch nicht ganz richtig.</strong> Vergleiche die Lage der Punkte, Strecken und Rechteckkanten noch einmal mit dem Zielmuster.</p>");
       }
     }
