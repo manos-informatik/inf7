@@ -715,7 +715,7 @@
         size: 5,
         canvasSize: 270,
         commands: [
-          "rechteck_zeichnen(0,0,4,4)",
+          "rechteck_zeichnen(0,4,4,4)",
           "punkt_zeichnen(1,3)",
           "punkt_zeichnen(3,3)",
           "senkrechte_strecke_zeichnen(1,1,2)",
@@ -728,11 +728,11 @@
         size: 11,
         canvasSize: 270,
         commands: [
-          "rechteck_zeichnen(0,0,10,10)",
+          "rechteck_zeichnen(0,10,10,10)",
           "waagerechte_strecke_zeichnen(1,3,8)",
           "waagerechte_strecke_zeichnen(7,9,8)",
-          "rechteck_zeichnen(2,6,1,1)",
-          "rechteck_zeichnen(7,6,1,1)",
+          "rechteck_zeichnen(2,7,1,1)",
+          "rechteck_zeichnen(7,7,1,1)",
           "senkrechte_strecke_zeichnen(5,4,6)",
           "waagerechte_strecke_zeichnen(4,6,4)",
           "punkt_zeichnen(2,3)",
@@ -784,7 +784,7 @@
       rectangle: {
         label: "Rechteck",
         name: "rechteck_zeichnen",
-        help: "Erst Ecke, dann Höhe und Breite.",
+        help: "Obere linke Ecke, dann Höhe und Breite.",
         args: [
           { key: "x", label: "x" },
           { key: "y", label: "y" },
@@ -985,10 +985,12 @@
     }
 
     function addRectangle(drawing, x, y, height, width) {
+      const bottomY = y - height;
+
       addHorizontal(drawing, x, x + width, y);
-      addHorizontal(drawing, x, x + width, y + height);
-      addVertical(drawing, x, y, y + height);
-      addVertical(drawing, x + width, y, y + height);
+      addHorizontal(drawing, x, x + width, bottomY);
+      addVertical(drawing, x, bottomY, y);
+      addVertical(drawing, x + width, bottomY, y);
     }
 
     function normalizeLines(text) {
@@ -1096,7 +1098,7 @@
                 throw new Error("Höhe und Breite müssen mindestens 1 sein.");
               }
 
-              if (x + width > level.size - 1 || y + height > level.size - 1) {
+              if (x + width > level.size - 1 || y - height < 0) {
                 throw new Error(`Das Rechteck passt nicht vollständig in das ${level.size}x${level.size}-Raster.`);
               }
 
