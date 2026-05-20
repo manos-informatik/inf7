@@ -812,6 +812,13 @@
       custom: []
     };
 
+    const studentDrawings = {
+      easy: null,
+      medium: null,
+      hard: null,
+      custom: null
+    };
+
     let currentLevelKey = "easy";
     let currentTarget = null;
     let currentStudent = null;
@@ -1360,7 +1367,8 @@
 
       const parsedTarget = level.freeDraw ? { drawing: createEmptyDrawing(level.size) } : parseCommands(level.commands.join("\n"), level);
       currentTarget = parsedTarget.drawing;
-      currentStudent = createEmptyDrawing(level.size);
+      currentStudent = studentDrawings[currentLevelKey] ?? createEmptyDrawing(level.size);
+      studentDrawings[currentLevelKey] = currentStudent;
       renderCommandRows();
       drawDrawing(targetCanvas, currentTarget, getComputedStyle(document.documentElement).getPropertyValue("--target").trim());
       drawDrawing(studentCanvas, currentStudent, getComputedStyle(document.documentElement).getPropertyValue("--student").trim());
@@ -1386,6 +1394,7 @@
 
       if (!prepared.hasContent) {
         currentStudent = createEmptyDrawing(level.size);
+        studentDrawings[currentLevelKey] = currentStudent;
         drawDrawing(studentCanvas, currentStudent, getComputedStyle(document.documentElement).getPropertyValue("--student").trim());
 
         if (showMessage) {
@@ -1411,6 +1420,7 @@
       }
 
       currentStudent = parsed.drawing;
+      studentDrawings[currentLevelKey] = currentStudent;
       drawDrawing(studentCanvas, currentStudent, getComputedStyle(document.documentElement).getPropertyValue("--student").trim());
 
       if (showMessage) {
@@ -1425,6 +1435,7 @@
       const level = LEVELS[currentLevelKey];
       drafts[currentLevelKey] = [];
       currentStudent = createEmptyDrawing(level.size);
+      studentDrawings[currentLevelKey] = currentStudent;
       renderCommandRows();
       drawDrawing(studentCanvas, currentStudent, getComputedStyle(document.documentElement).getPropertyValue("--student").trim());
       setFeedback("info", "<p>Die Zeichnung rechts wurde zurückgesetzt und alle Funktionen wurden gelöscht.</p>");
