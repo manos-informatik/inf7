@@ -105,27 +105,30 @@
       background: #f2f2f2;
     }
 
-    pre {
+    .code-list {
+      display: grid;
+      gap: 0;
       margin: 0;
       font-family: Consolas, "Courier New", monospace;
       font-size: 11pt;
       line-height: 1.55;
-      white-space: pre-wrap;
     }
 
-    .mark {
-      display: inline-grid;
-      width: 5mm;
-      height: 5mm;
-      place-items: center;
-      margin-left: 1mm;
-      border: 1px solid #111;
-      border-radius: 50%;
-      background: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 7.5pt;
-      font-weight: 700;
-      vertical-align: 0.8mm;
+    .code-row {
+      display: grid;
+      grid-template-columns: 8mm 1fr;
+      gap: 3mm;
+      min-height: 5.7mm;
+    }
+
+    .code-number {
+      color: #555;
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-text {
+      white-space: pre;
     }
 
     .legend {
@@ -203,7 +206,7 @@
 
     .answer-lines {
       display: grid;
-      gap: 4.8mm;
+      gap: 6.2mm;
     }
 
     .answer-lines div {
@@ -252,14 +255,6 @@
       vertical-align: -0.8mm;
     }
 
-    .origin-note {
-      margin-top: 3mm;
-      padding: 2.5mm 3mm;
-      border-left: 3px solid #777;
-      background: #f7f7f7;
-      font-size: 9.8pt;
-    }
-
     .two-column {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -298,44 +293,39 @@
 
     <div class="instruction">
       <p>Nutze die interaktive Webseite. Verändere die Werte im Code, starte das Programm und beobachte, was passiert. Beantworte anschließend die Fragen.</p>
-      <p class="web-link">Webseite: https://manos-informatik.github.io/inf7/Algorithmen/EinführungProcessing/</p>
+      <p class="web-link">Webseite: tinyurl.com/EinfuehrungProcessing</p>
     </div>
 
     <h2>Der Code</h2>
     <div class="code-section">
       <div class="code-box">
-        <pre><code>void setup<span class="mark">1</span>(){
-  size<span class="mark">3</span>(400,400);
-  background<span class="mark">4</span>(255,255,255);
-  strokeWeight<span class="mark">5</span>(10);
-}
-
-void draw<span class="mark">2</span>(){
-  if<span class="mark">6</span>(mousePressed<span class="mark">7</span>){
-    point<span class="mark">8</span>(mouseX<span class="mark">9</span>,mouseY<span class="mark">10</span>);
-  }
-}</code></pre>
+        <div class="code-list" aria-label="Processing-Code mit Zeilennummern">
+          <div class="code-row"><span class="code-number">1</span><code class="code-text">void setup(){</code></div>
+          <div class="code-row"><span class="code-number">2</span><code class="code-text">  size(400,400);</code></div>
+          <div class="code-row"><span class="code-number">3</span><code class="code-text">  background(255,255,255);</code></div>
+          <div class="code-row"><span class="code-number">4</span><code class="code-text">  strokeWeight(10);</code></div>
+          <div class="code-row"><span class="code-number">5</span><code class="code-text">}</code></div>
+          <div class="code-row"><span class="code-number">6</span><code class="code-text"></code></div>
+          <div class="code-row"><span class="code-number">7</span><code class="code-text">void draw(){</code></div>
+          <div class="code-row"><span class="code-number">8</span><code class="code-text">  if(mousePressed){</code></div>
+          <div class="code-row"><span class="code-number">9</span><code class="code-text">    point(mouseX,mouseY);</code></div>
+          <div class="code-row"><span class="code-number">10</span><code class="code-text">  }</code></div>
+          <div class="code-row"><span class="code-number">11</span><code class="code-text">}</code></div>
+        </div>
       </div>
 
       <aside class="legend" aria-label="Legende zum Code">
-        <h3>Markierungen</h3>
+        <h3>Zeilen</h3>
         <ul class="legend-list">
           <li><span class="legend-number">1</span><span>setup()</span></li>
-          <li><span class="legend-number">2</span><span>draw()</span></li>
-          <li><span class="legend-number">3</span><span>size(400,400)</span></li>
-          <li><span class="legend-number">4</span><span>background(255,255,255)</span></li>
-          <li><span class="legend-number">5</span><span>strokeWeight(10)</span></li>
-          <li><span class="legend-number">6</span><span>if(){ }</span></li>
-          <li><span class="legend-number">7</span><span>mousePressed</span></li>
-          <li><span class="legend-number">8</span><span>point(mouseX,mouseY)</span></li>
-          <li><span class="legend-number">9</span><span>mouseX</span></li>
-          <li><span class="legend-number">10</span><span>mouseY</span></li>
+          <li><span class="legend-number">2</span><span>size(400,400)</span></li>
+          <li><span class="legend-number">3</span><span>background(255,255,255)</span></li>
+          <li><span class="legend-number">4</span><span>strokeWeight(10)</span></li>
+          <li><span class="legend-number">7</span><span>draw()</span></li>
+          <li><span class="legend-number">8</span><span>if(){ } und mousePressed</span></li>
+          <li><span class="legend-number">9</span><span>point(mouseX,mouseY), mouseX, mouseY</span></li>
         </ul>
       </aside>
-    </div>
-
-    <div class="origin-note">
-      Im Zeichenfeld liegt der Ursprung oben links bei (0,0). x wird nach rechts größer, y wird nach unten größer.
     </div>
 
     <h2 style="margin-top: 6mm;">Aufgaben</h2>
@@ -345,7 +335,7 @@ void draw<span class="mark">2</span>(){
           <span class="task-number">Aufgabe 1:</span>
           <h3>setup()</h3>
         </div>
-        <p class="question">Wann wird <strong>void setup()</strong> ausgeführt? Wie oft passiert das nach dem Start des Programms?</p>
+        <p class="question">Wann wird <strong>void setup()</strong> ausgeführt?</p>
         <div class="answer-lines"><div></div><div></div><div></div></div>
       </article>
 
@@ -354,7 +344,7 @@ void draw<span class="mark">2</span>(){
           <span class="task-number">Aufgabe 2:</span>
           <h3>draw()</h3>
         </div>
-        <p class="question">Wann beginnt <strong>void draw()</strong>? Wie oft wird draw() danach ausgeführt?</p>
+        <p class="question">Startet <strong>void draw()</strong> nach <strong>void setup()</strong>? Wie oft wird draw() ausgeführt?</p>
         <div class="answer-lines"><div></div><div></div><div></div></div>
       </article>
 
@@ -364,7 +354,6 @@ void draw<span class="mark">2</span>(){
           <h3>size()</h3>
         </div>
         <p class="question">Teste verschiedene Werte bei <strong>size()</strong>. Was verändert der erste Parameter? Was verändert der zweite Parameter?</p>
-        <div class="answer-lines"><div></div><div></div><div></div></div>
         <div class="small-table">
           <div class="fill-row"><span>Erster Parameter:</span><span class="fill-line"></span></div>
           <div class="fill-row"><span>Zweiter Parameter:</span><span class="fill-line"></span></div>
@@ -374,7 +363,6 @@ void draw<span class="mark">2</span>(){
   </section>
 
   <section class="page">
-    <h2>Weitere Aufgaben</h2>
     <div class="tasks">
       <article class="task">
         <div class="task-title">
@@ -382,13 +370,7 @@ void draw<span class="mark">2</span>(){
           <h3>background()</h3>
         </div>
         <p class="question">Was verändert <strong>background()</strong>? Wofür stehen die drei Zahlen in den Klammern?</p>
-        <p class="hint">Tipp: Die Zahlen gehören zur RGB-Farbcodierung.</p>
         <div class="answer-lines"><div></div><div></div><div></div></div>
-        <div class="rgb-row">
-          <p>R = <span class="line-field"></span></p>
-          <p>G = <span class="line-field"></span></p>
-          <p>B = <span class="line-field"></span></p>
-        </div>
       </article>
 
       <article class="task">
@@ -427,15 +409,6 @@ void draw<span class="mark">2</span>(){
       <article class="task">
         <div class="task-title">
           <span class="task-number">Aufgabe 8:</span>
-          <h3>point()</h3>
-        </div>
-        <p class="question">Was zeichnet <strong>point(mouseX,mouseY)</strong>? Wo wird es gezeichnet?</p>
-        <div class="answer-lines"><div></div><div></div><div></div><div></div></div>
-      </article>
-
-      <article class="task">
-        <div class="task-title">
-          <span class="task-number">Aufgabe 9:</span>
           <h3>mouseX und mouseY</h3>
         </div>
         <p class="question">Was bedeuten <strong>mouseX</strong> und <strong>mouseY</strong>? Beobachte dazu die Werte, wenn du die Maus über das Zeichenfeld bewegst.</p>
@@ -444,6 +417,15 @@ void draw<span class="mark">2</span>(){
           <div class="fill-row"><span>mouseX beschreibt:</span><span class="fill-line"></span></div>
           <div class="fill-row"><span>mouseY beschreibt:</span><span class="fill-line"></span></div>
         </div>
+      </article>
+
+      <article class="task">
+        <div class="task-title">
+          <span class="task-number">Aufgabe 9:</span>
+          <h3>point()</h3>
+        </div>
+        <p class="question">Was zeichnet <strong>point(mouseX,mouseY)</strong>? Wo wird es gezeichnet?</p>
+        <div class="answer-lines"><div></div><div></div><div></div><div></div></div>
       </article>
 
       <article class="task">

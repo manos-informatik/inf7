@@ -142,26 +142,42 @@ h2 {
   line-height: 1.7;
 }
 
+.code-block code {
+  counter-reset: code-line;
+}
+
 .code-line,
 .code-group {
   display: block;
 }
 
 .code-line {
+  position: relative;
+  counter-increment: code-line;
   min-height: 30px;
-  padding: 2px 16px 2px 18px;
+  padding: 2px 16px 2px 54px;
   border-left: 4px solid transparent;
   color: #e2e8f0;
   white-space: nowrap;
   transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
+.code-line::before {
+  content: counter(code-line);
+  position: absolute;
+  left: 14px;
+  width: 24px;
+  color: #76869a;
+  text-align: right;
+  user-select: none;
+}
+
 .code-indent {
-  padding-left: 42px;
+  padding-left: 78px;
 }
 
 .code-double-indent {
-  padding-left: 66px;
+  padding-left: 102px;
 }
 
 #lineDraw {
@@ -499,10 +515,10 @@ h2 {
   }
 
   .code-indent {
-    padding-left: 34px;
+    padding-left: 70px;
   }
 
   .code-double-indent {
-    padding-left: 50px;
+    padding-left: 86px;
   }
 }
