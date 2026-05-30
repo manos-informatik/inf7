@@ -6,10 +6,10 @@
   const DRAW_POINT_DELAY_MS = 310;
   const NEUTRAL_RGB = [226, 232, 240];
   const SETUP_STEPS = [
-    { delay: 560, action: "highlightSize" },
-    { delay: 1240, action: "applySizeAndHighlightBackground" },
-    { delay: 1920, action: "applyBackgroundAndHighlightStroke" },
-    { delay: 2600, action: "finishSetup" }
+    { delay: 1000, action: "highlightSize" },
+    { delay: 2400, action: "applySizeAndHighlightBackground" },
+    { delay: 3800, action: "applyBackgroundAndHighlightStroke" },
+    { delay: 5200, action: "finishSetup" }
   ];
 
   const elements = {
@@ -430,19 +430,21 @@
     SETUP_STEPS.forEach((step) => {
       scheduleSetupStep(token, step.delay, () => {
         if (step.action === "highlightSize") {
+          setCanvasSize(settings.width, settings.height);
+          setCanvasBackground(NEUTRAL_RGB);
           highlightLine(elements.lineSize);
           elements.runStatus.textContent = "size()";
         }
 
         if (step.action === "applySizeAndHighlightBackground") {
-          setCanvasSize(settings.width, settings.height);
-          setCanvasBackground(NEUTRAL_RGB);
+          setCanvasBackground(settings.backgroundRgb);
           highlightLine(elements.lineBackground);
           elements.runStatus.textContent = "background()";
         }
 
         if (step.action === "applyBackgroundAndHighlightStroke") {
-          setCanvasBackground(settings.backgroundRgb);
+          state.strokeWeight = settings.strokeWeight;
+          updateStrokePreview(settings.strokeWeight);
           highlightLine(elements.lineStroke);
           elements.runStatus.textContent = "strokeWeight()";
         }
