@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daumenkino</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Algorithmen</p>
+        <h1>Daumenkino</h1>
+        <p class="intro">Viele Einzelbilder hintereinander wirken wie Bewegung.</p>
+      </div>
+      <p id="recordingStatus" class="status-pill" aria-live="polite">Bereit</p>
+    </header>
+
+    <section class="workspace" aria-label="Zeichenbereich und Frame-Vorschau">
+      <section class="panel" aria-labelledby="drawTitle">
+        <div class="panel-heading">
+          <h2 id="drawTitle">Zeichnen</h2>
+          <span class="hint">10 Sekunden</span>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="drawingCanvas" width="400" height="400" aria-label="Zeichenfläche"></canvas>
+        </div>
+
+        <div class="button-row">
+          <button id="startButton" class="button button-primary" type="button">Start</button>
+          <button id="resetButton" class="button button-secondary" type="button">Zurücksetzen</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="previewTitle">
+        <div class="panel-heading">
+          <h2 id="previewTitle">Vorschau</h2>
+          <span id="frameCounter" class="hint">Bild 0 / 50</span>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="preview-stage" aria-live="polite">
+            <img id="framePreview" alt="Aktueller Frame der Diashow">
+            <p id="previewPlaceholder">Noch keine Bilder</p>
+          </div>
+        </div>
+
+        <div class="slideshow-controls" aria-label="Steuerung der Diashow">
+          <button id="prevButton" class="button button-secondary" type="button">Zurück</button>
+          <button id="playButton" class="button button-primary" type="button">Abspielen</button>
+          <button id="nextButton" class="button button-secondary" type="button">Weiter</button>
+        </div>
+
+        <label class="slider-label" for="frameSlider">Frame auswählen</label>
+        <input id="frameSlider" class="frame-slider" type="range" min="1" max="50" value="1" disabled>
+      </section>
+    </section>
+  </main>
+</body>
+</html>
