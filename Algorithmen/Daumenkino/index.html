@@ -22,7 +22,7 @@
       <section class="panel" aria-labelledby="drawTitle">
         <div class="panel-heading">
           <h2 id="drawTitle">Zeichnen</h2>
-          <span class="hint">10 Sekunden</span>
+          <span class="hint">15 Sekunden</span>
         </div>
 
         <div class="canvas-wrap">
@@ -38,12 +38,12 @@
       <section class="panel" aria-labelledby="previewTitle">
         <div class="panel-heading">
           <h2 id="previewTitle">Vorschau</h2>
-          <span id="frameCounter" class="hint">Bild 0 / 50</span>
+          <span id="frameCounter" class="hint">Bild 0 / 75</span>
         </div>
 
         <div class="preview-wrap">
           <div class="preview-stage" aria-live="polite">
-            <img id="framePreview" alt="Aktueller Frame der Diashow">
+            <canvas id="framePreview" width="400" height="400" aria-label="Aktueller Frame der Diashow"></canvas>
             <p id="previewPlaceholder">Noch keine Bilder</p>
           </div>
         </div>
@@ -55,7 +55,7 @@
         </div>
 
         <label class="slider-label" for="frameSlider">Frame auswählen</label>
-        <input id="frameSlider" class="frame-slider" type="range" min="1" max="50" value="1" disabled>
+        <input id="frameSlider" class="frame-slider" type="range" min="1" max="75" value="1" disabled>
       </section>
     </section>
   </main>

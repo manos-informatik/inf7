@@ -173,7 +173,7 @@ h2 {
   display: none;
   width: 400px;
   height: 400px;
-  object-fit: contain;
+  background: #ffffff;
 }
 
 #previewPlaceholder {

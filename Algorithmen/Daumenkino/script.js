@@ -2,9 +2,9 @@
   "use strict";
 
   const CANVAS_SIZE = 400;
-  const RECORDING_DURATION_MS = 10000;
+  const RECORDING_DURATION_MS = 15000;
   const FRAME_INTERVAL_MS = 200;
-  const TOTAL_FRAMES = 50;
+  const TOTAL_FRAMES = 75;
   const LINE_WIDTH = 4;
 
   const canvas = document.querySelector("#drawingCanvas");
@@ -17,6 +17,7 @@
   const frameSlider = document.querySelector("#frameSlider");
   const frameCounter = document.querySelector("#frameCounter");
   const framePreview = document.querySelector("#framePreview");
+  const previewContext = framePreview.getContext("2d", { willReadFrequently: true });
   const previewPlaceholder = document.querySelector("#previewPlaceholder");
   const recordingStatus = document.querySelector("#recordingStatus");
 
@@ -29,7 +30,8 @@
     captureTimerId: null,
     countdownTimerId: null,
     stopTimerId: null,
-    playbackTimerId: null
+    playbackTimerId: null,
+    previewRenderId: 0
   };
 
   function clearCanvas() {
@@ -55,6 +57,91 @@
     window.clearInterval(state.playbackTimerId);
     state.playbackTimerId = null;
     playButton.textContent = "Abspielen";
+  }
+
+  function loadFrameImage(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Frame konnte nicht geladen werden."));
+      image.src = src;
+    });
+  }
+
+  function drawImageDataToCanvas(image) {
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = CANVAS_SIZE;
+    tempCanvas.height = CANVAS_SIZE;
+    const tempContext = tempCanvas.getContext("2d", { willReadFrequently: true });
+    tempContext.drawImage(image, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    return tempContext.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }
+
+  function getLuminance(data, offset) {
+    return (data[offset] * 0.299) + (data[offset + 1] * 0.587) + (data[offset + 2] * 0.114);
+  }
+
+  function drawCurrentFrameChanges(previousImage, currentImage) {
+    const diffCanvas = document.createElement("canvas");
+    const previousData = drawImageDataToCanvas(previousImage).data;
+    const currentImageData = drawImageDataToCanvas(currentImage);
+    const currentData = currentImageData.data;
+
+    diffCanvas.width = CANVAS_SIZE;
+    diffCanvas.height = CANVAS_SIZE;
+    const diffContext = diffCanvas.getContext("2d", { willReadFrequently: true });
+
+    for (let offset = 0; offset < currentData.length; offset += 4) {
+      const previousLuminance = getLuminance(previousData, offset);
+      const currentLuminance = getLuminance(currentData, offset);
+      const isNewDarkPixel = previousLuminance - currentLuminance > 8;
+
+      if (!isNewDarkPixel) {
+        currentData[offset + 3] = 0;
+      }
+    }
+
+    diffContext.putImageData(currentImageData, 0, 0);
+    previewContext.drawImage(diffCanvas, 0, 0);
+  }
+
+  async function renderPreview(index) {
+    const renderId = state.previewRenderId;
+
+    previewContext.fillStyle = "#ffffff";
+    previewContext.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    try {
+      const currentImage = await loadFrameImage(state.frames[index]);
+
+      if (renderId !== state.previewRenderId) {
+        return;
+      }
+
+      if (index === 0) {
+        previewContext.drawImage(currentImage, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        return;
+      }
+
+      const previousImage = await loadFrameImage(state.frames[index - 1]);
+
+      if (renderId !== state.previewRenderId) {
+        return;
+      }
+
+      // Onion-Skinning: Der vorherige Stand wird blass, nur die neue Änderung kräftig gezeichnet.
+      previewContext.globalAlpha = 0.24;
+      previewContext.drawImage(previousImage, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      previewContext.globalAlpha = 1;
+      drawCurrentFrameChanges(previousImage, currentImage);
+    } catch (error) {
+      if (renderId === state.previewRenderId) {
+        previewPlaceholder.textContent = "Frame konnte nicht angezeigt werden";
+        previewPlaceholder.style.display = "block";
+      }
+    } finally {
+      previewContext.globalAlpha = 1;
+    }
   }
 
   function captureFrame() {
@@ -86,21 +173,25 @@
   }
 
   function showFrame(index) {
+    state.previewRenderId += 1;
+
     if (state.frames.length === 0) {
-      framePreview.removeAttribute("src");
+      previewContext.fillStyle = "#ffffff";
+      previewContext.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
       framePreview.style.display = "none";
       previewPlaceholder.style.display = "block";
+      previewPlaceholder.textContent = "Noch keine Bilder";
       frameSlider.value = "1";
       frameCounter.textContent = `Bild 0 / ${TOTAL_FRAMES}`;
       return;
     }
 
     state.currentFrameIndex = Math.min(Math.max(index, 0), state.frames.length - 1);
-    framePreview.src = state.frames[state.currentFrameIndex];
     framePreview.style.display = "block";
     previewPlaceholder.style.display = "none";
     frameSlider.value = String(state.currentFrameIndex + 1);
     frameCounter.textContent = `Bild ${state.currentFrameIndex + 1} / ${TOTAL_FRAMES}`;
+    renderPreview(state.currentFrameIndex);
   }
 
   function finishRecording() {
@@ -108,7 +199,7 @@
       return;
     }
 
-    // Der 10-Sekunden-Abschluss ergänzt fehlende Frames, falls ein Intervall verzögert wurde.
+    // Der 15-Sekunden-Abschluss ergänzt fehlende Frames, falls ein Intervall verzögert wurde.
     while (state.frames.length < TOTAL_FRAMES) {
       captureFrame();
     }
@@ -151,7 +242,7 @@
     updateRecordingStatus();
     updateControls();
 
-    // Alle 0,2 Sekunden wird ein Bild gesichert; nach 10 Sekunden ist Schluss.
+    // Alle 0,2 Sekunden wird ein Bild gesichert; nach 15 Sekunden ist Schluss.
     state.captureTimerId = window.setInterval(handleCaptureTick, FRAME_INTERVAL_MS);
     state.countdownTimerId = window.setInterval(updateRecordingStatus, 100);
     state.stopTimerId = window.setTimeout(finishRecording, RECORDING_DURATION_MS);
@@ -253,6 +344,8 @@
   prevButton.addEventListener("click", showPreviousFrame);
   nextButton.addEventListener("click", showNextFrame);
   playButton.addEventListener("click", togglePlayback);
+
+  frameSlider.max = String(TOTAL_FRAMES);
 
   frameSlider.addEventListener("input", () => {
     stopPlayback();
