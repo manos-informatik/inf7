@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const DRAW_INTERVAL_MS = 80;
+  const DRAW_INTERVAL_MS = 33;
   const NEUTRAL_RGB = [226, 232, 240];
   const SETUP_STEPS = [
     { delay: 560, action: "highlightSize" },
@@ -27,6 +27,7 @@
     lineBackground: document.querySelector("#lineBackground"),
     lineStroke: document.querySelector("#lineStroke"),
     lineDraw: document.querySelector("#lineDraw"),
+    strokePreviewDot: document.querySelector("#strokePreviewDot"),
     inputs: Array.from(document.querySelectorAll(".code-input")),
     sizeWidth: document.querySelector("#sizeWidth"),
     sizeHeight: document.querySelector("#sizeHeight"),
@@ -300,8 +301,14 @@
   function prepareNeutralCanvas() {
     const settings = readSettings(false);
 
-    setCanvasBackground(NEUTRAL_RGB);
+    setCanvasBackground(settings.backgroundRgb);
     setCanvasSize(settings.width, settings.height);
+    updateStrokePreview(settings.strokeWeight);
+  }
+
+  function updateStrokePreview(strokeWeight) {
+    elements.strokePreviewDot.style.width = `${strokeWeight}px`;
+    elements.strokePreviewDot.style.height = `${strokeWeight}px`;
   }
 
   function resetSimulation() {
@@ -331,6 +338,7 @@
     }
 
     state.strokeWeight = settings.strokeWeight;
+    updateStrokePreview(settings.strokeWeight);
     state.isSetupRunning = false;
     state.isDrawRunning = true;
     elements.runStatus.textContent = "draw() läuft";
@@ -362,6 +370,7 @@
     updateControls();
     setCanvasSize(1, 1);
     setCanvasBackground(NEUTRAL_RGB);
+    updateStrokePreview(settings.strokeWeight);
     highlightLine(elements.lineSetup);
     elements.runStatus.textContent = "setup()";
 
@@ -393,7 +402,7 @@
   }
 
   function getCanvasPoint(event) {
-    const rect = elements.drawingCanvas.getBoundingClientRect();
+    const rect = elements.canvasStack.getBoundingClientRect();
     const x = Math.floor((event.clientX - rect.left) * (elements.drawingCanvas.width / rect.width));
     const y = Math.floor((event.clientY - rect.top) * (elements.drawingCanvas.height / rect.height));
 
@@ -419,6 +428,7 @@
       return;
     }
 
+    event.preventDefault();
     const point = updatePointerPosition(event);
 
     if (point === null) {
@@ -427,14 +437,23 @@
 
     state.mousePressed = true;
     updateMouseDisplay();
+
+    if (state.isDrawRunning) {
+      drawPoint(point.x, point.y);
+    }
   }
 
   function handleMouseMove(event) {
-    updatePointerPosition(event);
+    const point = updatePointerPosition(event);
 
     if (state.mousePressed && (event.buttons & 1) !== 1) {
       state.mousePressed = false;
       updateMouseDisplay();
+      return;
+    }
+
+    if (state.isDrawRunning && state.mousePressed && point !== null) {
+      drawPoint(point.x, point.y);
     }
   }
 
@@ -456,6 +475,7 @@
 
   function handleInputChange(event) {
     normalizeInput(event.currentTarget, false);
+    updateStrokePreview(readInputNumber(elements.strokeWeight));
 
     if (!state.isSetupRunning && !state.isDrawRunning) {
       prepareNeutralCanvas();
@@ -464,6 +484,7 @@
 
   function handleInputCommit(event) {
     normalizeInput(event.currentTarget, true);
+    updateStrokePreview(readInputNumber(elements.strokeWeight));
 
     if (!state.isSetupRunning && !state.isDrawRunning) {
       prepareNeutralCanvas();
@@ -472,9 +493,9 @@
 
   elements.startButton.addEventListener("click", startSimulation);
   elements.resetButton.addEventListener("click", resetSimulation);
-  elements.drawingCanvas.addEventListener("mousedown", handleMouseDown);
-  elements.drawingCanvas.addEventListener("mousemove", handleMouseMove);
-  elements.drawingCanvas.addEventListener("mouseleave", handleMouseLeave);
+  elements.canvasStack.addEventListener("mousedown", handleMouseDown);
+  elements.canvasStack.addEventListener("mousemove", handleMouseMove);
+  elements.canvasStack.addEventListener("mouseleave", handleMouseLeave);
   window.addEventListener("mouseup", handleMouseUp);
 
   elements.inputs.forEach((input) => {

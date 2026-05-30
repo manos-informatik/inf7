@@ -231,6 +231,44 @@ h2 {
   font-weight: 800;
 }
 
+.stroke-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(168, 181, 199, 0.18);
+  border-radius: 8px;
+  color: #bfd0e3;
+  background: rgba(15, 23, 42, 0.46);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.stroke-preview-field {
+  width: 72px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.25);
+  border-radius: 8px;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.1) 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+
+.stroke-preview-dot {
+  width: 10px;
+  height: 10px;
+  display: block;
+  border-radius: 50%;
+  background: #000000;
+}
+
 .canvas-board {
   max-width: 100%;
   overflow: auto;
@@ -275,10 +313,13 @@ h2 {
 
 .drawing-layer {
   z-index: 1;
+}
+
+.canvas-stack {
   cursor: not-allowed;
 }
 
-.canvas-stack.is-ready .drawing-layer {
+.canvas-stack.is-ready {
   cursor: crosshair;
 }
 
