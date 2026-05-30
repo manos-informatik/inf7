@@ -364,6 +364,24 @@
     elements.strokePreviewDot.style.height = `${strokeWeight}px`;
   }
 
+  function stopSimulationForCodeChange() {
+    state.runToken += 1;
+    clearSetupTimeouts();
+    stopDrawLoop();
+
+    state.isSetupRunning = false;
+    state.drawCount = 0;
+    state.mouseInside = false;
+    state.mousePressed = false;
+    state.mousePosition = null;
+
+    clearActiveCode();
+    updateDrawCounter();
+    updateMouseDisplay();
+    updateControls();
+    elements.runStatus.textContent = "Bereit";
+  }
+
   function resetSimulation() {
     state.runToken += 1;
     clearSetupTimeouts();
@@ -532,18 +550,22 @@
     normalizeInput(event.currentTarget, false);
     updateStrokePreview(readInputNumber(elements.strokeWeight));
 
-    if (!state.isSetupRunning && !state.isDrawRunning) {
-      prepareNeutralCanvas();
+    if (state.isSetupRunning || state.isDrawRunning) {
+      stopSimulationForCodeChange();
     }
+
+    prepareNeutralCanvas();
   }
 
   function handleInputCommit(event) {
     normalizeInput(event.currentTarget, true);
     updateStrokePreview(readInputNumber(elements.strokeWeight));
 
-    if (!state.isSetupRunning && !state.isDrawRunning) {
-      prepareNeutralCanvas();
+    if (state.isSetupRunning || state.isDrawRunning) {
+      stopSimulationForCodeChange();
     }
+
+    prepareNeutralCanvas();
   }
 
   elements.startButton.addEventListener("click", startSimulation);
