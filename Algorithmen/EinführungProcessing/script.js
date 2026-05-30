@@ -4,6 +4,7 @@
   const DRAW_INTERVAL_MS = 520;
   const DRAW_CHECK_DELAY_MS = 150;
   const DRAW_POINT_DELAY_MS = 310;
+  const MAX_CANVAS_SIZE = 400;
   const NEUTRAL_RGB = [226, 232, 240];
   const SETUP_STEPS = [
     { delay: 1000, action: "highlightSize" },
@@ -13,6 +14,8 @@
   ];
 
   const elements = {
+    canvasBoard: document.querySelector(".canvas-board"),
+    canvasViewport: document.querySelector(".canvas-viewport"),
     canvasStack: document.querySelector("#canvasStack"),
     drawingCanvas: document.querySelector("#drawingCanvas"),
     gridCanvas: document.querySelector("#gridCanvas"),
@@ -59,7 +62,8 @@
     strokeWeight: 10,
     backgroundRgb: [255, 255, 255],
     canvasWidth: 400,
-    canvasHeight: 400
+    canvasHeight: 400,
+    displayScale: 1
   };
 
   function clamp(value, min, max) {
@@ -178,20 +182,56 @@
     [elements.drawingCanvas, elements.gridCanvas].forEach((canvas) => {
       canvas.width = width;
       canvas.height = height;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
     });
 
-    elements.canvasStack.style.width = `${width}px`;
-    elements.canvasStack.style.height = `${height}px`;
     clearDrawingLayer();
     drawGrid();
+    updateCanvasDisplaySize();
   }
 
   function setCanvasBackground(rgb) {
     state.backgroundRgb = [...rgb];
     elements.canvasStack.style.backgroundColor = rgbText(rgb);
     drawGrid();
+  }
+
+  function getMaximumCanvasDisplayScale() {
+    if (window.innerWidth >= 1800 && window.innerHeight >= 950) {
+      return 1.6;
+    }
+
+    if (window.innerWidth >= 1320 && window.innerHeight >= 800) {
+      return 1.35;
+    }
+
+    return 1;
+  }
+
+  function updateCanvasDisplaySize() {
+    const boardStyles = window.getComputedStyle(elements.canvasBoard);
+    const horizontalPadding = parseFloat(boardStyles.paddingLeft) + parseFloat(boardStyles.paddingRight);
+    const availableWidth = Math.max(160, elements.canvasBoard.clientWidth - horizontalPadding);
+    const boardTop = elements.canvasBoard.getBoundingClientRect().top;
+    const availableHeight = Math.max(180, window.innerHeight - boardTop - 120);
+    const scale = Math.min(
+      getMaximumCanvasDisplayScale(),
+      availableWidth / MAX_CANVAS_SIZE,
+      availableHeight / MAX_CANVAS_SIZE
+    );
+    const viewportSize = Math.round(MAX_CANVAS_SIZE * scale);
+    const displayWidth = Math.max(1, Math.round(state.canvasWidth * scale));
+    const displayHeight = Math.max(1, Math.round(state.canvasHeight * scale));
+
+    state.displayScale = scale;
+    elements.canvasViewport.style.width = `${viewportSize}px`;
+    elements.canvasViewport.style.height = `${viewportSize}px`;
+    elements.canvasStack.style.width = `${displayWidth}px`;
+    elements.canvasStack.style.height = `${displayHeight}px`;
+
+    [elements.drawingCanvas, elements.gridCanvas].forEach((canvas) => {
+      canvas.style.width = `${displayWidth}px`;
+      canvas.style.height = `${displayHeight}px`;
+    });
   }
 
   function clearActiveCode() {
@@ -580,6 +620,13 @@
     input.addEventListener("input", handleInputChange);
     input.addEventListener("blur", handleInputCommit);
   });
+
+  window.addEventListener("resize", updateCanvasDisplaySize);
+
+  if ("ResizeObserver" in window) {
+    const resizeObserver = new ResizeObserver(updateCanvasDisplaySize);
+    resizeObserver.observe(elements.canvasBoard);
+  }
 
   resetSimulation();
 })();
