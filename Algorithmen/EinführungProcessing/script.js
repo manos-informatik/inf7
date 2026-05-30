@@ -1,7 +1,9 @@
 (() => {
   "use strict";
 
-  const DRAW_INTERVAL_MS = 33;
+  const DRAW_INTERVAL_MS = 520;
+  const DRAW_CHECK_DELAY_MS = 150;
+  const DRAW_POINT_DELAY_MS = 310;
   const NEUTRAL_RGB = [226, 232, 240];
   const SETUP_STEPS = [
     { delay: 560, action: "highlightSize" },
@@ -27,6 +29,8 @@
     lineBackground: document.querySelector("#lineBackground"),
     lineStroke: document.querySelector("#lineStroke"),
     lineDraw: document.querySelector("#lineDraw"),
+    lineIf: document.querySelector("#lineIf"),
+    linePoint: document.querySelector("#linePoint"),
     strokePreviewDot: document.querySelector("#strokePreviewDot"),
     inputs: Array.from(document.querySelectorAll(".code-input")),
     sizeWidth: document.querySelector("#sizeWidth"),
@@ -43,6 +47,7 @@
   const state = {
     animationFrameId: null,
     setupTimeoutIds: new Set(),
+    drawStepTimeoutIds: new Set(),
     runToken: 0,
     isSetupRunning: false,
     isDrawRunning: false,
@@ -190,6 +195,7 @@
   }
 
   function clearActiveCode() {
+    clearDrawStepHighlights();
     elements.codeLines.forEach((line) => line.classList.remove("is-active"));
     elements.drawBlock.classList.remove("is-running");
   }
@@ -202,7 +208,6 @@
   function highlightDrawLoop() {
     clearActiveCode();
     elements.drawBlock.classList.add("is-running");
-    elements.lineDraw.classList.add("is-active");
   }
 
   function updateDrawCounter() {
@@ -237,12 +242,37 @@
     state.setupTimeoutIds.clear();
   }
 
+  function clearDrawStepTimeouts() {
+    state.drawStepTimeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    state.drawStepTimeoutIds.clear();
+  }
+
+  function clearDrawStepHighlights() {
+    [elements.lineDraw, elements.lineIf, elements.linePoint].forEach((line) => {
+      line.classList.remove("is-draw-call", "is-draw-check", "is-draw-action");
+    });
+  }
+
+  function scheduleDrawStep(token, delay, callback) {
+    const timeoutId = window.setTimeout(() => {
+      state.drawStepTimeoutIds.delete(timeoutId);
+
+      if (state.runToken === token && state.isDrawRunning) {
+        callback();
+      }
+    }, delay);
+
+    state.drawStepTimeoutIds.add(timeoutId);
+  }
+
   function stopDrawLoop() {
     if (state.animationFrameId !== null) {
       window.cancelAnimationFrame(state.animationFrameId);
       state.animationFrameId = null;
     }
 
+    clearDrawStepTimeouts();
+    clearDrawStepHighlights();
     state.isDrawRunning = false;
     state.lastDrawTimestamp = 0;
   }
@@ -255,6 +285,32 @@
     drawingContext.fill();
   }
 
+  function showDrawStep(line, className) {
+    clearDrawStepHighlights();
+    line.classList.add(className);
+  }
+
+  function showDrawCycle(token) {
+    clearDrawStepTimeouts();
+    showDrawStep(elements.lineDraw, "is-draw-call");
+
+    scheduleDrawStep(token, DRAW_CHECK_DELAY_MS, () => {
+      showDrawStep(elements.lineIf, "is-draw-check");
+    });
+
+    scheduleDrawStep(token, DRAW_POINT_DELAY_MS, () => {
+      const canDraw = state.mousePressed && state.mouseInside && state.mousePosition !== null;
+
+      if (!canDraw) {
+        showDrawStep(elements.lineIf, "is-draw-check");
+        return;
+      }
+
+      showDrawStep(elements.linePoint, "is-draw-action");
+      drawPoint(state.mousePosition.x, state.mousePosition.y);
+    });
+  }
+
   function runDrawLoop(token, timestamp) {
     if (!state.isDrawRunning || state.runToken !== token) {
       state.animationFrameId = null;
@@ -265,10 +321,7 @@
       state.lastDrawTimestamp = timestamp;
       state.drawCount += 1;
       updateDrawCounter();
-
-      if (state.mousePressed && state.mouseInside && state.mousePosition !== null) {
-        drawPoint(state.mousePosition.x, state.mousePosition.y);
-      }
+      showDrawCycle(token);
     }
 
     state.animationFrameId = window.requestAnimationFrame((nextTimestamp) => {
