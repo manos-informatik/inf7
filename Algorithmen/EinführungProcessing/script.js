@@ -5,7 +5,9 @@
   const DRAW_CHECK_DELAY_MS = 150;
   const DRAW_POINT_DELAY_MS = 310;
   const MAX_CANVAS_SIZE = 400;
-  const NEUTRAL_RGB = [226, 232, 240];
+  const IDLE_CANVAS_SIZE = 50;
+  const IDLE_STROKE_PREVIEW_WEIGHT = 5;
+  const NEUTRAL_RGB = [211, 211, 211];
   const SETUP_STEPS = [
     { delay: 1000, action: "highlightSize" },
     { delay: 2400, action: "applySizeAndHighlightBackground" },
@@ -59,7 +61,7 @@
     mouseInside: false,
     mousePressed: false,
     mousePosition: null,
-    strokeWeight: 10,
+    strokeWeight: 20,
     backgroundRgb: [255, 255, 255],
     canvasWidth: 400,
     canvasHeight: 400,
@@ -394,9 +396,9 @@
   function prepareNeutralCanvas() {
     const settings = readSettings(false);
 
-    setCanvasBackground(settings.backgroundRgb);
-    setCanvasSize(settings.width, settings.height);
-    updateStrokePreview(settings.strokeWeight);
+    setCanvasBackground(NEUTRAL_RGB);
+    setCanvasSize(IDLE_CANVAS_SIZE, IDLE_CANVAS_SIZE);
+    updateStrokePreview(IDLE_STROKE_PREVIEW_WEIGHT);
   }
 
   function updateStrokePreview(strokeWeight) {
@@ -479,9 +481,9 @@
     updateDrawCounter();
     updateMouseDisplay();
     updateControls();
-    setCanvasSize(1, 1);
+    setCanvasSize(IDLE_CANVAS_SIZE, IDLE_CANVAS_SIZE);
     setCanvasBackground(NEUTRAL_RGB);
-    updateStrokePreview(settings.strokeWeight);
+    updateStrokePreview(IDLE_STROKE_PREVIEW_WEIGHT);
     highlightLine(elements.lineSetup);
     elements.runStatus.textContent = "setup()";
 
@@ -588,7 +590,6 @@
 
   function handleInputChange(event) {
     normalizeInput(event.currentTarget, false);
-    updateStrokePreview(readInputNumber(elements.strokeWeight));
 
     if (state.isSetupRunning || state.isDrawRunning) {
       stopSimulationForCodeChange();
@@ -599,7 +600,6 @@
 
   function handleInputCommit(event) {
     normalizeInput(event.currentTarget, true);
-    updateStrokePreview(readInputNumber(elements.strokeWeight));
 
     if (state.isSetupRunning || state.isDrawRunning) {
       stopSimulationForCodeChange();
