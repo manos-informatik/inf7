@@ -262,8 +262,15 @@
     }
 
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 8mm 8mm 20mm;
+      }
+
       body {
         background: #fff;
+        font-size: 9.4pt;
+        line-height: 1.24;
       }
 
       .page {
@@ -272,6 +279,84 @@
         margin: 0;
         padding: 0;
         box-shadow: none;
+      }
+
+      h1 {
+        margin-bottom: 5mm;
+        font-size: 16pt;
+      }
+
+      h2 {
+        margin-bottom: 3mm;
+        padding-bottom: 1mm;
+        font-size: 12pt;
+      }
+
+      h3 {
+        margin-bottom: 1mm;
+        font-size: 10pt;
+      }
+
+      .meta {
+        margin-bottom: 4mm;
+      }
+
+      .instruction {
+        margin-bottom: 4mm;
+        padding: 2.5mm 3mm;
+      }
+
+      .code-section {
+        gap: 4mm;
+        margin-bottom: 4mm;
+      }
+
+      .code-box {
+        padding: 3mm;
+      }
+
+      .code-list {
+        font-size: 9.6pt;
+        line-height: 1.38;
+      }
+
+      .legend {
+        padding: 2.5mm;
+      }
+
+      .legend-list {
+        gap: 0.7mm;
+        font-size: 8.8pt;
+      }
+
+      .tasks {
+        gap: 2.7mm;
+      }
+
+      .task {
+        padding: 2.6mm;
+      }
+
+      .task-title {
+        margin-bottom: 1mm;
+      }
+
+      .question {
+        margin-bottom: 2mm;
+      }
+
+      .answer-lines {
+        gap: 4.6mm;
+      }
+
+      .small-table {
+        gap: 2mm;
+        margin-top: 2.6mm;
+      }
+
+      .checkbox-grid {
+        gap: 2mm 7mm;
+        margin: 1.5mm 0 2.5mm;
       }
 
       a {
