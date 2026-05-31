@@ -1,9 +1,9 @@
 (() => {
   "use strict";
 
-  const DRAW_INTERVAL_MS = 520;
-  const DRAW_CHECK_DELAY_MS = 150;
-  const DRAW_POINT_DELAY_MS = 310;
+  const DRAW_INTERVAL_MS = 260;
+  const DRAW_CHECK_DELAY_MS = 75;
+  const DRAW_POINT_DELAY_MS = 155;
   const MAX_CANVAS_SIZE = 400;
   const IDLE_CANVAS_SIZE = 50;
   const IDLE_STROKE_PREVIEW_WEIGHT = 5;
