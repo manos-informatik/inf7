@@ -264,7 +264,15 @@
     @media print {
       @page {
         size: A4 portrait;
+        margin: 8mm;
+      }
+
+      @page :right {
         margin: 8mm 8mm 8mm 20mm;
+      }
+
+      @page :left {
+        margin: 8mm 20mm 8mm 8mm;
       }
 
       body {
