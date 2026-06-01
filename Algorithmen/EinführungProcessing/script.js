@@ -23,6 +23,7 @@
     gridCanvas: document.querySelector("#gridCanvas"),
     startButton: document.querySelector("#startButton"),
     resetButton: document.querySelector("#resetButton"),
+    copyCodeButton: document.querySelector("#copyCodeButton"),
     drawCounter: document.querySelector("#drawCounter"),
     runStatus: document.querySelector("#runStatus"),
     mousePressedToken: document.querySelector("#mousePressedToken"),
@@ -53,6 +54,7 @@
     animationFrameId: null,
     setupTimeoutIds: new Set(),
     drawStepTimeoutIds: new Set(),
+    copyResetTimeoutId: null,
     runToken: 0,
     isSetupRunning: false,
     isDrawRunning: false,
@@ -175,6 +177,15 @@
       gridContext.fillStyle = labelColor;
       gridContext.fillText("(0,0)", 4, 13);
     }
+
+    if (width >= 50 && height >= 40) {
+      const sizeLabel = `(${width},${height})`;
+      const labelWidth = gridContext.measureText(sizeLabel).width;
+
+      gridContext.font = "10px Consolas, 'Courier New', monospace";
+      gridContext.fillStyle = labelColor;
+      gridContext.fillText(sizeLabel, Math.max(4, width - labelWidth - 4), height - 5);
+    }
   }
 
   function setCanvasSize(width, height) {
@@ -277,6 +288,67 @@
 
     elements.startButton.disabled = isBusy;
     elements.canvasStack.classList.toggle("is-ready", state.isDrawRunning);
+  }
+
+  function getCurrentProcessingCode() {
+    const settings = readSettings(true);
+
+    return `void setup(){
+  size(${settings.width},${settings.height});
+  background(${settings.backgroundRgb[0]},${settings.backgroundRgb[1]},${settings.backgroundRgb[2]});
+  strokeWeight(${settings.strokeWeight});
+}
+
+void draw(){
+  if(mousePressed){
+    point(mouseX,mouseY);
+  }
+}`;
+  }
+
+  function copyWithFallback(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    textarea.style.top = "0";
+    document.body.append(textarea);
+    textarea.select();
+
+    try {
+      return document.execCommand("copy");
+    } finally {
+      textarea.remove();
+    }
+  }
+
+  function showCopyFeedback(wasCopied) {
+    window.clearTimeout(state.copyResetTimeoutId);
+    elements.copyCodeButton.textContent = wasCopied ? "Kopiert" : "Nicht kopiert";
+
+    state.copyResetTimeoutId = window.setTimeout(() => {
+      elements.copyCodeButton.textContent = "Code kopieren";
+      state.copyResetTimeoutId = null;
+    }, 1600);
+  }
+
+  async function copyCurrentCode() {
+    const code = getCurrentProcessingCode();
+    let wasCopied = false;
+
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(code);
+        wasCopied = true;
+      } else {
+        wasCopied = copyWithFallback(code);
+      }
+    } catch (error) {
+      wasCopied = copyWithFallback(code);
+    }
+
+    showCopyFeedback(wasCopied);
   }
 
   function clearSetupTimeouts() {
@@ -610,6 +682,7 @@
 
   elements.startButton.addEventListener("click", startSimulation);
   elements.resetButton.addEventListener("click", resetSimulation);
+  elements.copyCodeButton.addEventListener("click", copyCurrentCode);
   elements.canvasStack.addEventListener("mousedown", handleMouseDown);
   elements.canvasStack.addEventListener("mousemove", handleMouseMove);
   elements.canvasStack.addEventListener("mouseleave", handleMouseLeave);

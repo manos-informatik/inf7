@@ -399,6 +399,12 @@ h2 {
   background: linear-gradient(165deg, var(--button-dark), var(--button-light));
 }
 
+.button-small {
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 0.9rem;
+}
+
 .button:hover:not(:disabled) {
   transform: translateY(-1px);
   filter: brightness(1.08);
