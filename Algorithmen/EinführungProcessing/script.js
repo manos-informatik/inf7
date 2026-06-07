@@ -24,6 +24,8 @@
     startButton: document.querySelector("#startButton"),
     resetButton: document.querySelector("#resetButton"),
     copyCodeButton: document.querySelector("#copyCodeButton"),
+    showDiagramButton: document.querySelector("#showDiagramButton"),
+    diagramOverlay: document.querySelector("#diagramOverlay"),
     drawCounter: document.querySelector("#drawCounter"),
     runStatus: document.querySelector("#runStatus"),
     mousePressedToken: document.querySelector("#mousePressedToken"),
@@ -680,9 +682,38 @@ void draw(){
     prepareNeutralCanvas();
   }
 
+  function openDiagramOverlay() {
+    if (elements.diagramOverlay) {
+      elements.diagramOverlay.classList.add("is-visible");
+      elements.diagramOverlay.setAttribute("aria-hidden", "false");
+    }
+  }
+
+  function closeDiagramOverlay() {
+    if (elements.diagramOverlay) {
+      elements.diagramOverlay.classList.remove("is-visible");
+      elements.diagramOverlay.setAttribute("aria-hidden", "true");
+    }
+  }
+
   elements.startButton.addEventListener("click", startSimulation);
   elements.resetButton.addEventListener("click", resetSimulation);
   elements.copyCodeButton.addEventListener("click", copyCurrentCode);
+  if (elements.showDiagramButton) {
+    elements.showDiagramButton.addEventListener("click", openDiagramOverlay);
+  }
+  if (elements.diagramOverlay) {
+    elements.diagramOverlay.addEventListener("click", (event) => {
+      if (event.target === elements.diagramOverlay) {
+        closeDiagramOverlay();
+      }
+    });
+  }
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && elements.diagramOverlay && elements.diagramOverlay.classList.contains("is-visible")) {
+      closeDiagramOverlay();
+    }
+  });
   elements.canvasStack.addEventListener("mousedown", handleMouseDown);
   elements.canvasStack.addEventListener("mousemove", handleMouseMove);
   elements.canvasStack.addEventListener("mouseleave", handleMouseLeave);
